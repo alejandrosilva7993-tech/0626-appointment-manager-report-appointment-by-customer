@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Usage by Customer — Appointment Manager</title>
+  <link href="https://unpkg.com/primeng@17.18.0/resources/themes/lara-light-blue/theme.css" rel="stylesheet">
+  <link href="https://unpkg.com/primeng@17.18.0/resources/primeng.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/primeicons@7.0.0/primeicons.css" rel="stylesheet" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --surface-300: #d1d5db;
+      --text-color: #4b5563;
+      --text-color-secondary: #6b7280;
+      --surface-0: #ffffff;
+      --surface-border: #dfe7ef;
+      --primary-color: #3b82f6;
+      --focus-ring: 0 0 0 0.2rem #BFDBFE;
+      --status-created: #334155;
+      --status-confirmed: #15803d;
+      --status-rejected: #b91c1c;
+      --status-completed: #7e22ce;
+      --tooltip-bg: #1e293b;
+      --tooltip-color: #f8fafc;
+      --tooltip-radius: 6px;
+      --tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      --status-dot-size: 8px;
+      --status-dot-ring: 2px;
+      --status-dot-ring-color: #ffffff;
+      --section-gap: 1rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100vh;
+      font-family: var(--font-family, system-ui, sans-serif);
+      background: #f8fafc;
+      color: var(--text-color);
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .pi {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-style: normal; font-variant: normal; font-weight: normal;
+      font-size: 1rem; line-height: 1; display: inline-block;
+      min-width: 1em; text-rendering: auto;
+    }
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+    .app.is-loading { pointer-events: none; }
+
+    .breadcrumb {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .breadcrumb ol {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      list-style: none;
+    }
+    .breadcrumb li + li::before {
+      content: ">";
+      margin-right: 0.35rem;
+      color: var(--text-color-secondary);
+    }
+    .breadcrumb li[aria-current="page"] {
+      color: var(--text-color);
+      font-weight: 500;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      color: var(--text-color);
+      font-weight: 600;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      min-height: 2.25rem;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #495057;
+      font-family: inherit;
+    }
+    .btn:hover { background: #f1f5f9; }
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+      border-color: var(--primary-color);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-primary:disabled { background: #3b82f6; border-color: #3b82f6; }
+
+    .form-input {
+      width: 100%;
+      min-height: 2.25rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.9rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background: white;
+      color: var(--text-color);
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    .form-input.invalid { border-color: #b91c1c; }
+    .select-wrapper { position: relative; }
+    select.form-input {
+      padding-right: 2.5rem;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .select-wrapper .select-icon {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-color-secondary);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+    .date-input-wrapper { position: relative; }
+    .date-input-wrapper .form-input { padding-right: 2.25rem; cursor: pointer; }
+    .date-input-icon {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-color-secondary);
+      pointer-events: none;
+    }
+
+    .criteria-wrapper { margin-bottom: var(--section-gap); }
+    .criteria-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 0.75rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      padding: 0.75rem 1rem;
+      overflow: visible;
+    }
+    .criteria-bar:has(.form-error.visible) {
+      padding-bottom: 2.75rem;
+    }
+    .criteria-bar.is-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: white;
+    }
+    .criteria-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 0;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .criteria-field label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-color);
+      white-space: nowrap;
+    }
+    .criteria-field label .required { color: #b91c1c; }
+    .criteria-field--customer { width: 240px; max-width: 240px; }
+    .criteria-field--date { width: 140px; max-width: 140px; }
+    .criteria-field--search { flex-shrink: 0; }
+    .criteria-field--search::before {
+      content: '';
+      display: block;
+      height: 1.05rem;
+      margin-bottom: 0.25rem;
+    }
+    .criteria-bar .form-error {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      margin-top: 0.2rem;
+      font-size: 0.7rem;
+      color: #b91c1c;
+      line-height: 1.2;
+      display: none;
+    }
+    .criteria-bar .form-error.visible { display: block; }
+
+    .dashboard-area { min-height: 200px; }
+    .dashboard-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-color-secondary);
+      background: transparent;
+    }
+    .dashboard-placeholder .pi {
+      font-size: 2.5rem;
+      color: #cbd5e1;
+      margin-bottom: 0.75rem;
+    }
+    .dashboard-placeholder p { font-size: 0.95rem; }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: var(--section-gap);
+    }
+    .dashboard-header h2 {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    .dashboard-header h2 #resultCustomerName {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    .dashboard-period {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.75rem;
+      background: #ffffff;
+      color: var(--text-color);
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.2;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 0;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin: 0 -1rem 0.75rem;
+      padding: 0 1rem 0.5rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--section-gap);
+      align-items: stretch;
+    }
+
+    .charts-grid > .card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #resultsContent {
+      display: flex;
+      flex-direction: column;
+      gap: var(--section-gap);
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 260px;
+    }
+    .chart-wrap--status {
+      height: 120px;
+    }
+    .chart-wrap canvas {
+      max-height: 100%;
+    }
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1rem;
+      margin-top: 0.75rem;
+    }
+    .chart-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+    }
+    .chart-legend-value {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .charts-grid > .card .stat-card,
+    .charts-grid > .card .pct-row {
+      background: white;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      box-shadow: none;
+      padding: 0.75rem 1rem;
+    }
+
+    .charts-grid > .card .stat-card {
+      margin-bottom: 0.75rem;
+    }
+    .stat-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .stat-icon .pi { font-size: 1.15rem; }
+    .stat-icon--appointments { background: #f3e8ff; color: #7e22ce; }
+    .stat-icon--ahead { background: #dcfce7; color: #15803d; }
+    .stat-icon--ontime { background: #eff6ff; color: #3b82f6; }
+    .stat-icon--late { background: #fef2f2; color: #b91c1c; }
+    .stat-value {
+      font-size: 1.575rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.1;
+      margin-bottom: 0.3rem;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      line-height: 1.3;
+    }
+    .stat-label strong {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: var(--status-dot-size);
+      height: var(--status-dot-size);
+      min-width: var(--status-dot-size);
+      min-height: var(--status-dot-size);
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: none;
+      box-shadow: 0 0 0 var(--status-dot-ring) var(--surface-0, #ffffff);
+      vertical-align: middle;
+    }
+    .status-dot--created { background: var(--status-created); }
+    .status-dot--confirmed { background: var(--status-confirmed); }
+    .status-dot--rejected { background: var(--status-rejected); }
+    .status-dot--completed { background: var(--status-completed); }
+
+    .pct-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .pct-row:last-child {
+      margin-bottom: 0;
+    }
+    .pct-row-value {
+      font-size: 1.575rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.1;
+      min-width: 4.5rem;
+    }
+    .pct-row-count {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      line-height: 1.3;
+      margin-top: 0.15rem;
+    }
+    .pct-row-metrics {
+      min-width: 5rem;
+      flex-shrink: 0;
+    }
+    .scheduling-summary {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      line-height: 1.3;
+      margin: 0 0 0.25rem;
+    }
+    .scheduling-summary strong {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    .pct-row-label {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      line-height: 1.3;
+      flex: 1;
+    }
+    .charts-grid > .card .pct-row-label {
+      margin-left: 0.75rem;
+      padding-left: 1.25rem;
+      border-left: 1px solid #e2e8f0;
+    }
+    .pct-row-label strong {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .warning-panel {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem 0;
+      background: transparent;
+      border: none;
+    }
+    .warning-panel .pi {
+      font-size: 1.5rem;
+      color: #eab308;
+      flex-shrink: 0;
+    }
+    .warning-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #334155;
+      margin-bottom: 0.35rem;
+    }
+    .warning-body {
+      font-size: 0.95rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1200;
+      backdrop-filter: blur(1px);
+    }
+    .loader-overlay.hidden { display: none; }
+    .loader-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      padding: 1rem 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #334155;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .loader-card .pi { font-size: 1.1rem; color: #3b82f6; }
+
+    .hidden { display: none !important; }
+
+    .results-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--section-gap);
+    }
+    .results-stack > .dashboard-header {
+      margin-bottom: 0;
+    }
+
+    .flatpickr-calendar.flatpickr-open,
+    .flatpickr-calendar.inline { background: #fff !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; font-family: var(--font-family, system-ui, sans-serif) !important; }
+    .flatpickr-months { background: #fff !important; border-bottom: 1px solid #e2e8f0 !important; border-radius: 8px 8px 0 0 !important; }
+    .flatpickr-current-month { color: #334155 !important; font-size: 1rem !important; }
+    .flatpickr-current-month .cur-month { font-weight: 700 !important; color: #334155 !important; }
+    .flatpickr-weekday { color: #334155 !important; font-weight: 600 !important; font-size: 0.8rem !important; }
+    .flatpickr-day { color: #334155 !important; border-radius: 50% !important; }
+    .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay { color: #cbd5e1 !important; }
+    .flatpickr-day:hover { background: #f1f5f9 !important; }
+    .flatpickr-day.selected { background: transparent !important; color: #334155 !important; border: 1px solid #334155 !important; }
+    .flatpickr-day.today { border-color: #94a3b8 !important; }
+
+    @media (max-width: 992px) {
+      .criteria-bar { gap: 0.6rem; }
+      .criteria-field--customer { width: calc(50% - 0.4rem); max-width: none; }
+      .criteria-field--date { width: calc(25% - 0.4rem); max-width: none; }
+      .criteria-field--search { width: 100%; margin-left: 0; }
+      .criteria-field--search .btn { width: 100%; justify-content: center; }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 576px) {
+      .criteria-field--customer,
+      .criteria-field--date { width: 100%; max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li>Reports</li>
+        <li aria-current="page">System Usage by Customer</li>
+      </ol>
+    </nav>
+
+    <header class="header">
+      <h1>System Usage by Customer</h1>
+    </header>
+
+    <div class="criteria-wrapper">
+      <section class="criteria-bar" id="criteriaBar">
+        <div class="criteria-field criteria-field--customer">
+          <label for="customerSelect">Customer <span class="required">*</span></label>
+          <div class="select-wrapper">
+            <select id="customerSelect" class="form-input">
+              <option value="">Select customer</option>
+            </select>
+            <i class="pi pi-chevron-down select-icon" aria-hidden="true"></i>
+          </div>
+          <span class="form-error" id="errCustomer" aria-live="polite">Customer is required.</span>
+        </div>
+
+        <div class="criteria-field criteria-field--date">
+          <label for="startDate">Start Date <span class="required">*</span></label>
+          <div class="date-input-wrapper">
+            <input type="text" id="startDate" class="form-input" placeholder="mm/dd/yyyy" readonly>
+            <i class="pi pi-calendar date-input-icon" aria-hidden="true"></i>
+          </div>
+          <span class="form-error" id="errStartDate" aria-live="polite">Start Date must be equal to or earlier than today.</span>
+        </div>
+
+        <div class="criteria-field criteria-field--date">
+          <label for="endDate">End Date <span class="required">*</span></label>
+          <div class="date-input-wrapper">
+            <input type="text" id="endDate" class="form-input" placeholder="mm/dd/yyyy" readonly>
+            <i class="pi pi-calendar date-input-icon" aria-hidden="true"></i>
+          </div>
+          <span class="form-error" id="errEndDate" aria-live="polite">End Date must be equal to or later than Start Date.</span>
+        </div>
+
+        <div class="criteria-field criteria-field--search">
+          <button type="button" class="btn btn-primary" id="btnSearch" disabled>
+            Search
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <div class="dashboard-area" id="dashboardArea">
+      <div class="dashboard-placeholder" id="dashboardPlaceholder">
+        <i class="pi pi-inbox" aria-hidden="true"></i>
+        <p>Perform a search to view the report.</p>
+      </div>
+
+      <div id="resultsArea" class="hidden results-stack">
+        <div class="dashboard-header hidden" id="dashboardHeader">
+          <div>
+            <h2><span id="resultCustomerName"></span> Information <span class="dashboard-period" id="dashboardPeriod"></span></h2>
+          </div>
+          <button type="button" class="btn" id="btnExportExcel" disabled aria-disabled="true">
+            <i class="pi pi-file-excel" aria-hidden="true"></i> Export to Excel
+          </button>
+        </div>
+
+        <div id="emptyState" class="hidden">
+          <div class="warning-panel" role="alert">
+            <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+            <div>
+              <div class="warning-title">No results found</div>
+              <div class="warning-body">
+                No information was found for the entered criteria.<br>
+                Please try again.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="resultsContent" class="hidden">
+          <div class="charts-grid">
+            <div class="card" id="appointmentsCard" aria-label="Customer appointments">
+              <h3 class="card-title">Number of Customer Appointments</h3>
+              <div class="stat-card">
+                <div class="stat-icon stat-icon--appointments"><i class="pi pi-calendar" aria-hidden="true"></i></div>
+                <div>
+                  <div class="stat-value" id="metricTotalAppointments">-</div>
+                  <div class="stat-label"><strong>Total Appointments</strong> in Period</div>
+                </div>
+              </div>
+              <div class="chart-wrap chart-wrap--status" id="chartStatusWrap" role="img" aria-labelledby="chartStatusSummary">
+                <div class="sr-only" id="chartStatusSummary"></div>
+                <canvas id="chartStatus"></canvas>
+              </div>
+              <div class="chart-legend" id="chartStatusLegend" aria-hidden="true"></div>
+            </div>
+
+            <div class="card" aria-label="Scheduling performance">
+              <h3 class="card-title">Scheduling Performance</h3>
+              <p class="scheduling-summary">Based on <strong id="metricCompletedTotal">0</strong> completed appointments</p>
+              <div class="pct-row">
+                <div class="stat-icon stat-icon--ahead"><i class="pi pi-arrow-up" aria-hidden="true"></i></div>
+                <div class="pct-row-metrics">
+                  <div class="pct-row-value" id="pctAhead">0.0%</div>
+                  <div class="pct-row-count" id="countAhead">0 appointments</div>
+                </div>
+                <div class="pct-row-label"><strong>Ahead of schedule</strong><br>Completed earlier than scheduled time</div>
+              </div>
+              <div class="pct-row">
+                <div class="stat-icon stat-icon--ontime"><i class="pi pi-check" aria-hidden="true"></i></div>
+                <div class="pct-row-metrics">
+                  <div class="pct-row-value" id="pctOnTime">0.0%</div>
+                  <div class="pct-row-count" id="countOnTime">0 appointments</div>
+                </div>
+                <div class="pct-row-label"><strong>On time</strong><br>Completed at the same hour as scheduled</div>
+              </div>
+              <div class="pct-row">
+                <div class="stat-icon stat-icon--late"><i class="pi pi-arrow-down" aria-hidden="true"></i></div>
+                <div class="pct-row-metrics">
+                  <div class="pct-row-value" id="pctLate">0.0%</div>
+                  <div class="pct-row-count" id="countLate">0 appointments</div>
+                </div>
+                <div class="pct-row-label"><strong>Late</strong><br>Completed later than scheduled time</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader-overlay hidden" id="loaderOverlay" role="dialog" aria-modal="true" aria-labelledby="loaderText" aria-busy="false">
+    <div class="loader-card">
+      <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+      <span id="loaderText">Processing</span>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var STATUS_KEYS = ['created', 'confirmed', 'rejected', 'completed'];
+      var STATUS_LABELS = {
+        created: 'Created',
+        confirmed: 'Confirmed',
+        rejected: 'Rejected',
+        completed: 'Completed'
+      };
+
+      function getStatusColor(key) {
+        return getComputedStyle(document.documentElement)
+          .getPropertyValue('--status-' + key).trim();
+      }
+
+      function buildStatusColors() {
+        var colors = {};
+        STATUS_KEYS.forEach(function(k) { colors[k] = getStatusColor(k); });
+        return colors;
+      }
+
+      var STATUS_COLORS = buildStatusColors();
+
+      var CHART_TOOLTIP = {
+        backgroundColor: '#1e293b',
+        titleColor: '#f8fafc',
+        bodyColor: '#f8fafc',
+        borderColor: '#1e293b',
+        borderWidth: 0,
+        cornerRadius: 6,
+        padding: 10,
+        boxPadding: 5,
+        titleFont: { size: 13, weight: '600' },
+        bodyFont: { size: 12 },
+        displayColors: true,
+        boxWidth: 8,
+        boxHeight: 8,
+        usePointStyle: true,
+        caretPadding: 6,
+        caretSize: 6,
+        callbacks: {
+          labelColor: function(ctx) {
+            var bg = ctx.dataset.backgroundColor;
+            if (Array.isArray(bg)) bg = bg[ctx.dataIndex];
+            return {
+              borderColor: '#ffffff',
+              backgroundColor: bg,
+              borderWidth: 2,
+              borderRadius: 8
+            };
+          }
+        }
+      };
+
+      var chartStatus = null;
+
+      var MOCK = {
+        customers: [
+          {
+            id: 'CUS-001', name: 'Fast Cargo SA', status: 'Active',
+            hasDataInPeriod: true,
+            appointments: { total: 42, created: 10, confirmed: 18, rejected: 4, completed: 10 },
+            scheduling: { completedTotal: 10, ahead: 3, onTime: 5, late: 2 }
+          },
+          {
+            id: 'CUS-002', name: 'Southern Shipping', status: 'Active',
+            hasDataInPeriod: true,
+            appointments: { total: 28, created: 6, confirmed: 12, rejected: 3, completed: 7 },
+            scheduling: { completedTotal: 7, ahead: 2, onTime: 3, late: 2 }
+          },
+          {
+            id: 'CUS-003', name: 'No Appointments Ltd', status: 'Active',
+            hasDataInPeriod: false,
+            appointments: { total: 0, created: 0, confirmed: 0, rejected: 0, completed: 0 },
+            scheduling: { completedTotal: 0, ahead: 0, onTime: 0, late: 0 }
+          },
+          {
+            id: 'CUS-004', name: 'Inactive Partner', status: 'Inactive',
+            hasDataInPeriod: false,
+            appointments: { total: 0, created: 0, confirmed: 0, rejected: 0, completed: 0 },
+            scheduling: { completedTotal: 0, ahead: 0, onTime: 0, late: 0 }
+          }
+        ]
+      };
+
+      var lastSearchResult = null;
+      var lastFocusedElement = null;
+      var startPicker, endPicker;
+
+      var app = document.getElementById('app');
+      var criteriaBar = document.getElementById('criteriaBar');
+      var customerSelect = document.getElementById('customerSelect');
+      var showValidationErrors = false;
+      var touchedFields = { customer: false, startDate: false, endDate: false };
+      var btnSearch = document.getElementById('btnSearch');
+      var btnExportExcel = document.getElementById('btnExportExcel');
+      var loaderOverlay = document.getElementById('loaderOverlay');
+      var loaderText = document.getElementById('loaderText');
+      var dashboardPlaceholder = document.getElementById('dashboardPlaceholder');
+      var dashboardHeader = document.getElementById('dashboardHeader');
+      var resultsArea = document.getElementById('resultsArea');
+      var emptyState = document.getElementById('emptyState');
+      var resultsContent = document.getElementById('resultsContent');
+
+      function parseDate(str) {
+        if (!str) return null;
+        var parts = str.split('/');
+        if (parts.length !== 3) return null;
+        return new Date(+parts[2], +parts[0] - 1, +parts[1]);
+      }
+
+      function formatEnglishDate(str) {
+        var date = parseDate(str);
+        if (!date || isNaN(date.getTime())) return str;
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+
+      function daysBetween(a, b) {
+        return Math.floor(Math.abs(b - a) / (1000 * 60 * 60 * 24));
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function formatPercent(value) {
+        return value.toFixed(1) + '%';
+      }
+
+      function getActiveCustomers() {
+        return MOCK.customers.filter(function(c) { return c.status === 'Active'; });
+      }
+
+      function getSelectedCustomer() {
+        var id = customerSelect.value;
+        return id ? MOCK.customers.find(function(c) { return c.id === id; }) || null : null;
+      }
+
+      function populateCustomers() {
+        getActiveCustomers().forEach(function(customer) {
+          var opt = document.createElement('option');
+          opt.value = customer.id;
+          opt.textContent = customer.name;
+          customerSelect.appendChild(opt);
+        });
+      }
+
+      function showError(id, show, message) {
+        var el = document.getElementById(id);
+        if (message) el.textContent = message;
+        el.classList.toggle('visible', !!show);
+      }
+
+      function shouldShowFieldError(field) {
+        return showValidationErrors || touchedFields[field];
+      }
+
+      function getCriteriaState() {
+        var customer = customerSelect.value;
+        var startStr = document.getElementById('startDate').value;
+        var endStr = document.getElementById('endDate').value;
+        var today = new Date();
+        today.setHours(23, 59, 59, 999);
+
+        var startDate = parseDate(startStr);
+        var endDate = parseDate(endStr);
+        var customerInvalid = !customer;
+        var startInvalid = !startStr || !startDate || startDate > today;
+        var endInvalid = !endStr || !endDate || (startDate && endDate < startDate);
+        var rangeInvalid = startDate && endDate && !endInvalid && daysBetween(startDate, endDate) > 31;
+        var endMessage = rangeInvalid
+          ? 'Maximum range allowed is 31 days.'
+          : 'End Date must be equal to or later than Start Date.';
+        var valid = !customerInvalid && !startInvalid && !endInvalid && !rangeInvalid;
+
+        return {
+          valid: valid,
+          customerInvalid: customerInvalid,
+          startInvalid: startInvalid,
+          endInvalid: endInvalid,
+          rangeInvalid: rangeInvalid,
+          endMessage: endMessage
+        };
+      }
+
+      function validateCriteria(options) {
+        options = options || {};
+        if (options.showAll) showValidationErrors = true;
+        if (options.field) touchedFields[options.field] = true;
+
+        var state = getCriteriaState();
+        var showCustomer = shouldShowFieldError('customer') && state.customerInvalid;
+        var showStart = shouldShowFieldError('startDate') && state.startInvalid;
+        var showEnd = shouldShowFieldError('endDate') && (state.endInvalid || state.rangeInvalid);
+
+        showError('errCustomer', showCustomer);
+        showError('errStartDate', showStart);
+        if (showEnd) {
+          showError('errEndDate', true, state.endMessage);
+        } else {
+          showError('errEndDate', false);
+        }
+
+        customerSelect.classList.toggle('invalid', showCustomer);
+        document.getElementById('startDate').classList.toggle('invalid', showStart);
+        document.getElementById('endDate').classList.toggle('invalid', showEnd);
+        btnSearch.disabled = !state.valid;
+        return state.valid;
+      }
+
+      function updateSearchButton() {
+        btnSearch.disabled = !getCriteriaState().valid;
+      }
+
+      function bindNativeDateFallback() {
+        var startInput = document.getElementById('startDate');
+        var endInput = document.getElementById('endDate');
+        startInput.removeAttribute('readonly');
+        endInput.removeAttribute('readonly');
+        startInput.placeholder = 'mm/dd/yyyy';
+        endInput.placeholder = 'mm/dd/yyyy';
+        startInput.addEventListener('change', function() { validateCriteria({ field: 'startDate' }); });
+        startInput.addEventListener('blur', function() { validateCriteria({ field: 'startDate' }); });
+        endInput.addEventListener('change', function() { validateCriteria({ field: 'endDate' }); });
+        endInput.addEventListener('blur', function() { validateCriteria({ field: 'endDate' }); });
+      }
+
+      function initDatePickers() {
+        if (typeof flatpickr !== 'function') {
+          bindNativeDateFallback();
+          return;
+        }
+        try {
+          var today = new Date();
+          startPicker = flatpickr('#startDate', {
+            dateFormat: 'm/d/Y',
+            maxDate: today,
+            allowInput: true,
+            onChange: function() {
+              if (endPicker && startPicker.selectedDates[0]) {
+                var maxEnd = new Date(startPicker.selectedDates[0]);
+                maxEnd.setDate(maxEnd.getDate() + 31);
+                if (maxEnd > today) maxEnd = today;
+                endPicker.set('minDate', startPicker.selectedDates[0]);
+                endPicker.set('maxDate', maxEnd);
+              }
+              validateCriteria({ field: 'startDate' });
+            }
+          });
+          endPicker = flatpickr('#endDate', {
+            dateFormat: 'm/d/Y',
+            maxDate: today,
+            allowInput: true,
+            onChange: function() { validateCriteria({ field: 'endDate' }); }
+          });
+        } catch (err) {
+          console.error(err);
+          bindNativeDateFallback();
+        }
+      }
+
+      function syncExportButtonVisual(showEnabled) {
+        btnExportExcel.disabled = !showEnabled;
+        btnExportExcel.setAttribute('aria-disabled', showEnabled ? 'false' : 'true');
+      }
+
+      function setLoading(loading, text) {
+        loaderText.textContent = text || 'Processing';
+        loaderOverlay.classList.toggle('hidden', !loading);
+        loaderOverlay.setAttribute('aria-busy', loading ? 'true' : 'false');
+        app.classList.toggle('is-loading', loading);
+        if (loading) {
+          lastFocusedElement = document.activeElement;
+        } else if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+          lastFocusedElement.focus();
+          lastFocusedElement = null;
+        }
+      }
+
+      function calculatePercentages(scheduling) {
+        var total = scheduling.completedTotal;
+        if (!total) {
+          return { ahead: 0, onTime: 0, late: 0 };
+        }
+        return {
+          ahead: (scheduling.ahead / total) * 100,
+          onTime: (scheduling.onTime / total) * 100,
+          late: (scheduling.late / total) * 100
+        };
+      }
+
+      function runQuery() {
+        var customer = getSelectedCustomer();
+        if (!customer) return null;
+        var percentages = calculatePercentages(customer.scheduling);
+        return {
+          customer: customer,
+          appointments: customer.appointments,
+          scheduling: customer.scheduling,
+          percentages: percentages,
+          hasData: customer.hasDataInPeriod && customer.appointments.total > 0
+        };
+      }
+
+      function destroyStatusChart() {
+        if (chartStatus) {
+          chartStatus.destroy();
+          chartStatus = null;
+        }
+        var legendEl = document.getElementById('chartStatusLegend');
+        if (legendEl) legendEl.innerHTML = '';
+      }
+
+      function renderChartLegend(appointments) {
+        var el = document.getElementById('chartStatusLegend');
+        el.innerHTML = STATUS_KEYS.map(function(key) {
+          return '<span class="chart-legend-item">' +
+            '<span class="status-dot status-dot--' + key + '"></span> ' +
+            STATUS_LABELS[key] + ': <span class="chart-legend-value">' + appointments[key] + '</span>' +
+            '</span>';
+        }).join('');
+      }
+
+      function updateChartSummary(customerName, appointments) {
+        var statusParts = STATUS_KEYS.map(function(k) {
+          return STATUS_LABELS[k] + ': ' + appointments[k];
+        });
+        document.getElementById('chartStatusSummary').textContent =
+          customerName + ' appointments by status. ' + statusParts.join(', ') + '. Total: ' + appointments.total + '.';
+      }
+
+      function renderStatusChart(customerName, appointments) {
+        destroyStatusChart();
+        var appointmentsCard = document.getElementById('appointmentsCard');
+        if (typeof Chart !== 'function') {
+          appointmentsCard.classList.add('hidden');
+          return;
+        }
+        appointmentsCard.classList.remove('hidden');
+        updateChartSummary(customerName, appointments);
+        renderChartLegend(appointments);
+
+        var chartWrap = document.getElementById('chartStatusWrap');
+        chartWrap.style.height = '120px';
+
+        var appointmentTotal = appointments.total;
+        var maxTotalDigits = String(appointmentTotal).length;
+        var chartLabelFont = '600 13px ' + (getComputedStyle(document.body).fontFamily || 'system-ui, sans-serif');
+
+        chartStatus = new Chart(document.getElementById('chartStatus'), {
+          type: 'bar',
+          data: {
+            labels: [customerName],
+            datasets: STATUS_KEYS.map(function(key) {
+              return {
+                label: STATUS_LABELS[key],
+                data: [appointments[key]],
+                backgroundColor: STATUS_COLORS[key],
+                borderWidth: 1,
+                borderColor: '#ffffff',
+                borderSkipped: false,
+                borderRadius: 0,
+                barThickness: 18
+              };
+            })
+          },
+          plugins: [{
+            id: 'statusBarTotal',
+            afterDatasetsDraw: function(chart) {
+              var ctx = chart.ctx;
+              var xScale = chart.scales.x;
+              var yMeta = chart.getDatasetMeta(0);
+              if (!xScale || !yMeta || !yMeta.data.length) return;
+
+              ctx.save();
+              ctx.font = chartLabelFont;
+              ctx.fillStyle = '#4b5563';
+              ctx.textAlign = 'left';
+              ctx.textBaseline = 'middle';
+              yMeta.data.forEach(function(bar) {
+                var x = xScale.getPixelForValue(appointmentTotal) + 6;
+                ctx.fillText(appointmentTotal, x, bar.y);
+              });
+              ctx.restore();
+            }
+          }],
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+              padding: { right: maxTotalDigits * 9 + 14 }
+            },
+            interaction: {
+              mode: 'index',
+              axis: 'y',
+              intersect: false
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: Object.assign({}, CHART_TOOLTIP, {
+                bodySpacing: 7,
+                footerMarginTop: 10,
+                callbacks: Object.assign({}, CHART_TOOLTIP.callbacks, {
+                  label: function(ctx) {
+                    return ctx.dataset.label + ': ' + ctx.raw;
+                  },
+                  footer: function(items) {
+                    var total = items.reduce(function(sum, item) { return sum + item.raw; }, 0);
+                    return 'Total: ' + total;
+                  }
+                })
+              })
+            },
+            scales: {
+              x: {
+                stacked: true,
+                beginAtZero: true,
+                grid: { color: '#f1f5f9' },
+                ticks: { color: '#6b7280', font: { size: 11 } }
+              },
+              y: {
+                stacked: true,
+                grid: { display: false },
+                ticks: { color: '#4b5563', font: { size: 13 } }
+              }
+            }
+          }
+        });
+      }
+
+      function formatAppointmentCount(count) {
+        return count + (count === 1 ? ' appointment' : ' appointments');
+      }
+
+      function renderSchedulingPerformance(result) {
+        var scheduling = result.scheduling;
+        document.getElementById('metricCompletedTotal').textContent = scheduling.completedTotal;
+        document.getElementById('pctAhead').textContent = formatPercent(result.percentages.ahead);
+        document.getElementById('pctOnTime').textContent = formatPercent(result.percentages.onTime);
+        document.getElementById('pctLate').textContent = formatPercent(result.percentages.late);
+        document.getElementById('countAhead').textContent = formatAppointmentCount(scheduling.ahead);
+        document.getElementById('countOnTime').textContent = formatAppointmentCount(scheduling.onTime);
+        document.getElementById('countLate').textContent = formatAppointmentCount(scheduling.late);
+      }
+
+      function renderResults(result) {
+        document.getElementById('resultCustomerName').textContent = result.customer.name;
+        document.getElementById('metricTotalAppointments').textContent = result.appointments.total;
+        document.getElementById('dashboardPeriod').textContent =
+          formatEnglishDate(document.getElementById('startDate').value) + ' – ' +
+          formatEnglishDate(document.getElementById('endDate').value);
+        renderSchedulingPerformance(result);
+        renderStatusChart(result.customer.name, result.appointments);
+      }
+
+      function showResults(result) {
+        dashboardPlaceholder.classList.add('hidden');
+        resultsArea.classList.remove('hidden');
+
+        if (!result.hasData) {
+          dashboardHeader.classList.add('hidden');
+          emptyState.classList.remove('hidden');
+          resultsContent.classList.add('hidden');
+          syncExportButtonVisual(false);
+        } else {
+          dashboardHeader.classList.remove('hidden');
+          emptyState.classList.add('hidden');
+          resultsContent.classList.remove('hidden');
+          syncExportButtonVisual(true);
+          renderResults(result);
+        }
+      }
+
+      customerSelect.addEventListener('change', function() {
+        validateCriteria({ field: 'customer' });
+      });
+
+      customerSelect.addEventListener('blur', function() {
+        validateCriteria({ field: 'customer' });
+      });
+
+      btnSearch.addEventListener('click', function() {
+        if (!validateCriteria({ showAll: true })) return;
+        destroyStatusChart();
+        dashboardPlaceholder.classList.add('hidden');
+        resultsArea.classList.add('hidden');
+        dashboardHeader.classList.add('hidden');
+        emptyState.classList.add('hidden');
+        resultsContent.classList.add('hidden');
+        lastSearchResult = null;
+        syncExportButtonVisual(false);
+        setLoading(true, 'Processing');
+
+        setTimeout(function() {
+          lastSearchResult = runQuery();
+          criteriaBar.classList.add('is-sticky');
+          setLoading(false);
+          showResults(lastSearchResult);
+        }, 1200);
+      });
+
+      populateCustomers();
+      initDatePickers();
+      updateSearchButton();
+    });
+  </script>
+</body>
+</html>
