@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colors by Appointment Status - Transport Portal</title>
+  <style>
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      color: #1e293b;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #0f172a;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+    .theme-info {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border: 1px solid #e2e8f0;
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .color-swatch {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .color-hex {
+      font-family: monospace;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .usage { font-size: 0.85rem; color: #64748b; }
+  </style>
+</head>
+<body>
+  <h1>Colors by Appointment Status</h1>
+  <p class="subtitle">Appointment Management</p>
+  <p class="theme-info">PrimeNG theme: <strong>lara-light-blue</strong></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Sample</th>
+        <th>HEX Code</th>
+        <th>PrimeNG Style</th>
+        <th>Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Created</strong></td>
+        <td><div class="color-swatch" style="background: #334155;"></div></td>
+        <td class="color-hex">#334155</td>
+        <td class="color-hex">bluegray-800</td>
+        <td class="usage">Filter indicator, left border cards, badge</td>
+      </tr>
+      <tr>
+        <td><strong>Confirmed</strong></td>
+        <td><div class="color-swatch" style="background: #15803d;"></div></td>
+        <td class="color-hex">#15803d</td>
+        <td class="color-hex">green-700</td>
+        <td class="usage">Filter indicator, left border cards, badge</td>
+      </tr>
+      <tr>
+        <td><strong>Rejected</strong></td>
+        <td><div class="color-swatch" style="background: #b91c1c;"></div></td>
+        <td class="color-hex">#b91c1c</td>
+        <td class="color-hex">red-700</td>
+        <td class="usage">Filter indicator, left border cards, badge</td>
+      </tr>
+      <tr>
+        <td><strong>Completed</strong></td>
+        <td><div class="color-swatch" style="background: #7e22ce;"></div></td>
+        <td class="color-hex">#7e22ce</td>
+        <td class="color-hex">purple-600</td>
+        <td class="usage">Filter indicator, left border cards, badge</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
